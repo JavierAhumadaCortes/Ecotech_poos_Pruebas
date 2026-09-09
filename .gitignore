@@ -1,0 +1,23 @@
+# Entorno virtual
+.venv/
+
+# Editor de código
+.vscode/
+
+# Archivos de configuración sensible
+.env
+
+# Python bytecode y archivos compilados
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pruebas y análisis de código
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Empaquetado y distribución
+*.egg-info/
+dist/
+build/
