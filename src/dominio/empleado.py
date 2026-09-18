@@ -6,6 +6,9 @@ class Empleado:
         self.id = id
         self.nombre = nombre
         self.correo = correo
+        
+    def __str__(self):
+        return f"Empleado(id={self.id}, nombre={self.nombre}, correo={self.correo})"
 
     def mostrar_datos(self) -> str:
-        return f"{self.nombre} - {self.correo}"
+        return f"id:{self.id} {self.nombre} - {self.correo}"
