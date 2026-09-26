@@ -23,3 +23,30 @@ for item in EmpleadoDAO.listar():
     
     
     
+empleado = EmpleadoDAO.buscar_por_id(1)
+
+empleado.correo = "nuevo@ecotech.cl"
+
+print(empleado.correo)
+
+
+resultado = EmpleadoDAO.eliminar(99999)
+
+print(resultado)
+
+
+conexion = None
+
+
+try:
+    actualizado = EmpleadoDAO.actualizar(empleado)
+
+    if actualizado:
+        print("Empleado actualizado correctamente.")
+    else:
+        print("Empleado no encontrado.")
+
+except Exception:
+    print(
+        "No fue posible completar la operación."
+    )
