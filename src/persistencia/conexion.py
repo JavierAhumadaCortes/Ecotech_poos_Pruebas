@@ -3,7 +3,6 @@ import os
 import sqlite3
 import pymysql
 from dotenv import load_dotenv
-
 load_dotenv()
 
 def obtener_motor():
@@ -25,7 +24,6 @@ def abrir_conexion():
         )
 
     raise ValueError(f"Motor no soportado: {motor}")
-
 
 def marcador_sql():
     if obtener_motor() == "sqlite":
