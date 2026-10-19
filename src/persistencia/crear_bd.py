@@ -40,7 +40,7 @@ def crear_tablas():
                 id {tipo_id},
                 empleado_id INTEGER NOT NULL UNIQUE,
                 nombre_usuario {tipo_texto} NOT NULL UNIQUE,
-                contrasena {tipo_texto} NOT NULL,
+                password_hash {tipo_texto} NOT NULL,
                 FOREIGN KEY (empleado_id) REFERENCES empleado(id)
             )
         ''',

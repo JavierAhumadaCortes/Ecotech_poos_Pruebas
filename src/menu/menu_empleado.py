@@ -6,36 +6,73 @@ def clear():
     command = "cls" if os.name == "nt" else "clear"
     subprocess.run(command, shell=True, check=False)
 
+def pedir_dato(mensaje, validador, valor_actual=None):
+    while True:
+        entrada = input(mensaje)
+
+        # En una actualización, Enter conserva el valor actual.
+        if valor_actual is not None and not entrada.strip():
+            return valor_actual
+
+        try:
+            return validador(entrada)
+        except (TypeError, ValueError) as error:
+            print(f"{error} Intenta nuevamente.")
+
 def crear_empleado():
-    # Cargar el dominio al ejecutar la opción, no al importar el menú.
     from dominio.empleado import Empleado
     from persistencia.empleado_dao import EmpleadoDAO
 
-    while True:
-        try:
-            nombre = Empleado.validar_nombre(input("Nombre: ").strip())
-            break
-        except Exception as error:
-            print(f"Datos inválidos: {error}. Intenta nuevamente.")
-            continue
-        
-    while True:   
-        try:
-            correo = Empleado.validar_correo(input("Correo: ").strip())
-            break
-        except Exception as error:
-            print(f"Datos inválidos: {error}. Intenta nuevamente.")
-            continue
+    nombre = pedir_dato(
+        "Nombre: ",
+        Empleado.validar_nombre,
+    )
 
-    try:
-        empleado = Empleado(nombre=nombre, correo=correo)
-        EmpleadoDAO.insertar(empleado)
-    except Exception as error:
-        print(f"No fue posible guardar el empleado: {error}")
-        return
+    correo = pedir_dato(
+        "Correo: ",
+        Empleado.validar_correo,
+    )
+
+    empleado = Empleado(nombre=nombre, correo=correo)
+
+    # El DAO debe confirmar el guardado o lanzar una excepción.
+    EmpleadoDAO.insertar(empleado)
+
     print("Empleado creado correctamente.")
 
+def actualizar_empleado():
+    from dominio.empleado import Empleado
+    from persistencia.empleado_dao import EmpleadoDAO
 
+    empleado_id = pedir_id("ID del empleado a actualizar: ")
+    if empleado_id is None:
+        return
+
+    empleado = EmpleadoDAO.buscar_por_id(empleado_id)
+
+    if empleado is None:
+        print("Empleado no encontrado.")
+        return
+
+    nombre = pedir_dato(
+        f"Nuevo nombre [{empleado.nombre}] (Enter para conservar): ",
+        Empleado.validar_nombre,
+        valor_actual=empleado.nombre,
+    )
+
+    correo = pedir_dato(
+        f"Nuevo correo [{empleado.correo}] (Enter para conservar): ",
+        Empleado.validar_correo,
+        valor_actual=empleado.correo,
+    )
+
+    empleado.actualizar_datos(nombre, correo)
+
+    if EmpleadoDAO.actualizar(empleado):
+        print("Empleado actualizado correctamente.")
+    else:
+        print("No fue posible actualizar el empleado.")
+        
 def listar_empleados():
     from persistencia.empleado_dao import EmpleadoDAO
 
@@ -46,14 +83,12 @@ def listar_empleados():
     for empleado in empleados:
         print(empleado)
 
-
 def pedir_id(mensaje):
     try:
         return int(input(mensaje))
     except ValueError:
         print("Ingresa un ID válido.")
         return None
-
 
 def buscar_empleado():
     from persistencia.empleado_dao import EmpleadoDAO
@@ -67,31 +102,6 @@ def buscar_empleado():
     else:
         print(empleado.mostrar_datos())
 
-
-def actualizar_empleado():
-    from persistencia.empleado_dao import EmpleadoDAO
-
-    empleado_id = pedir_id("ID del empleado a actualizar: ")
-    if empleado_id is None:
-        return
-    empleado = EmpleadoDAO.buscar_por_id(empleado_id)
-    if empleado is None:
-        print("Empleado no encontrado.")
-        return
-
-    nombre = input(f"Nuevo nombre [{empleado.nombre}]: ").strip()
-    correo = input(f"Nuevo correo [{empleado.correo}]: ").strip()
-    if nombre:
-        empleado.nombre = nombre
-    if correo:
-        empleado.correo = correo
-
-    if EmpleadoDAO.actualizar(empleado):
-        print("Empleado actualizado correctamente.")
-    else:
-        print("No fue posible actualizar el empleado.")
-
-
 def eliminar_empleado():
     from persistencia.empleado_dao import EmpleadoDAO
 
@@ -102,7 +112,6 @@ def eliminar_empleado():
         print("Empleado eliminado correctamente.")
     else:
         print("Empleado no encontrado.")
-
 
 def menu_empleado():
     opciones = {
@@ -132,4 +141,3 @@ def menu_empleado():
             accion()
         else:
             print("Opción no válida.")
-

@@ -1,49 +1,41 @@
 # src/dominio/usuario.py
 class Usuario:
-    MIN_NOMBRE = 2
-    MAX_NOMBRE = 100
-    MIN_PASSWORD = 6
-    MAX_PASSWORD = 254
+    MIN_USUARIO = 3
+    MAX_USUARIO = 40
+    MIN_CLAVE = 15
 
-    def __init__(self, nombre, password, id=None):
+    def __init__(self, nombre_usuario, password_hash, id=None):
         self.id = id
-        self.nombre = self.normalizar_usuario(nombre)
-        self.password = self.validar_password(password)
-    
-    @classmethod    
-    def normalizar_usuario(nombre):
-        # 1. LIMPIEZA: Elimina espacios en blanco a los 
-        # lados y convierte todo a minúsculas para 
-        # evitar duplicados como "Admin" y "admin".
+        self.nombre_usuario = self.normalizar_usuario(nombre_usuario)
+        self.password_hash = password_hash
+
+    @classmethod
+    def normalizar_usuario(cls, nombre):
+        if not isinstance(nombre, str):
+            raise TypeError("El usuario debe ser texto.")
         nombre = nombre.strip().lower()
-        
-        # 2. SEGURIDAD (Longitud): Evita nombres vacíos y 
-        # previene ataques enviando textos inmensos que 
-        # saturen la base de datos.
-        if not 3 <= len(nombre) <= 40:
-            raise ValueError("Usuario: entre 3 y 40 caracteres.")
-            
-        # 3. SEGURIDAD (Formato): Solo permite letras, números y guiones bajos estándar (ASCII). 
-        # Bloquea caracteres especiales (<, >, ', ") previniendo ataques de inyección (SQL/XSS).
+        if not cls.MIN_USUARIO <= len(nombre) <= cls.MAX_USUARIO:
+            raise ValueError(
+                f"Usuario: entre {cls.MIN_USUARIO} y "
+                f"{cls.MAX_USUARIO} caracteres."
+            )
         if not all(c.isascii() and (c.isalnum() or c == "_")
                 for c in nombre):
-            raise ValueError("Use letras, números o guion bajo.")
-            
-        # 4. RETORNO: Devuelve el nombre ya validado y seguro para guardarlo en tu objeto o modelo.
+            raise ValueError("Use letras ASCII, números o guion bajo.")
         return nombre
     
     @classmethod
-    def validar_password(cls, password):
-        if not isinstance(password, str):
-            raise TypeError("La contraseña debe ser texto")
-        password = password.strip()
-        if not cls.MIN_PASSWORD <= len(password) <= cls.MAX_PASSWORD:
+    def validar_clave(cls, clave):
+        if not isinstance(clave, str):
+            raise TypeError("La contraseña debe ser texto.")
+        if len(clave) < cls.MIN_CLAVE:
             raise ValueError(
-                f"La contraseña debe tener entre {cls.MIN_PASSWORD} y {cls.MAX_PASSWORD} caracteres"
+                f"Use una frase de al menos {cls.MIN_CLAVE} caracteres."
             )
-        return password
-
-    
+        return clave  # Conservar espacios y mayúsculas.
 
     def __str__(self):
-        return f"Usuario(id={self.id}, nombre={self.nombre}, password={self.password})"
+        return f"Usuario(id={self.id}, nombre={self.nombre})"
+    
+
+

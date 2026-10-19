@@ -7,36 +7,63 @@ class Empleado:
 
     def __init__(self, nombre, correo, id=None):
         self.id = id
-        self.nombre = self.validar_nombre(nombre)
-        self.correo = self.validar_correo(correo)
+        self.actualizar_datos(nombre, correo)
         self.departamento = None
         self.proyectos = []
         self.registros_tiempo = []
 
     @classmethod
-    @staticmethod
     def validar_nombre(cls, nombre):
         if not isinstance(nombre, str):
-            raise TypeError("El nombre debe ser texto")
+            raise TypeError("El nombre debe ser texto.")
+
         nombre = nombre.strip()
+
         if not cls.MIN_NOMBRE <= len(nombre) <= cls.MAX_NOMBRE:
             raise ValueError(
-                f"El nombre debe tener entre {cls.MIN_NOMBRE} y {cls.MAX_NOMBRE} caracteres"
+                f"El nombre debe tener entre "
+                f"{cls.MIN_NOMBRE} y {cls.MAX_NOMBRE} caracteres."
             )
+
         return nombre
 
     @classmethod
-    @staticmethod
     def validar_correo(cls, correo):
         if not isinstance(correo, str):
-            raise TypeError("El correo debe ser texto")
+            raise TypeError("El correo debe ser texto.")
+
         correo = correo.strip()
-        if not cls.MIN_CORREO <= len(correo) <= cls.MAX_CORREO or correo.count("@") != 1:
-            raise ValueError("Ingrese un correo válido dentro del largo permitido")
+
+        if not cls.MIN_CORREO <= len(correo) <= cls.MAX_CORREO:
+            raise ValueError(
+                f"El correo debe tener entre "
+                f"{cls.MIN_CORREO} y {cls.MAX_CORREO} caracteres."
+            )
+
+        if any(caracter.isspace() for caracter in correo):
+            raise ValueError("El correo no debe contener espacios.")
+
+        if correo.count("@") != 1:
+            raise ValueError("El correo debe contener un solo @.")
+
         usuario, dominio = correo.split("@")
-        if not usuario or "." not in dominio or dominio.startswith(".") or dominio.endswith("."):
-            raise ValueError("Ingrese un correo válido")
+
+        if not usuario or "." not in dominio:
+            raise ValueError("Ingrese un correo como nombre@empresa.cl.")
+
+        if any(not parte for parte in dominio.split(".")):
+            raise ValueError("El dominio del correo contiene puntos inválidos.")
+
         return correo
+
+    def actualizar_datos(self, nombre, correo):
+        # Validar ambos campos antes de modificar el objeto.
+        nombre_validado = self.validar_nombre(nombre)
+        correo_validado = self.validar_correo(correo)
+
+        self.nombre = nombre_validado
+        self.correo = correo_validado
+
 
     def asignar_departamento(self, departamento):
         from dominio.departamento import Departamento
