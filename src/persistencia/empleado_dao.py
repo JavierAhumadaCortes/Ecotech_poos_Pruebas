@@ -63,7 +63,7 @@ class EmpleadoDAO:
         )
 
     @staticmethod
-    def buscar_por_id(id_empleado):
+    def buscar_por_id(empleado_id):
         conexion = abrir_conexion()
         try:
             cursor = conexion.cursor()
@@ -72,7 +72,7 @@ class EmpleadoDAO:
                 "SELECT id, nombre, correo "
                 f"FROM empleado WHERE id = {marcador}"
             )
-            cursor.execute(sql, (id_empleado,))
+            cursor.execute(sql, (empleado_id,))
             fila = cursor.fetchone()
         finally:
             conexion.close()
@@ -180,7 +180,7 @@ class EmpleadoDAO:
                 conexion.close()
 
     @staticmethod
-    def eliminar(id_empleado):
+    def eliminar(empleado_id):
         conexion = None
 
         try:
@@ -189,7 +189,7 @@ class EmpleadoDAO:
             marca = marcador_sql()
             sql = f"DELETE FROM empleado WHERE id = {marca}"
 
-            cursor.execute(sql, (id_empleado,))
+            cursor.execute(sql, (empleado_id,))
             conexion.commit()
             return cursor.rowcount > 0
         except Exception:
